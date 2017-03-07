@@ -8,6 +8,18 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+        <StackPanel Orientation="Vertical"
+                    Margin="20">
+            <TextBox 
+                x:Name="FolderNameTextBox"
+                PlaceholderText="Write foldername here..."/>
+            <Button x:Name="PickButton"
+                    Content="Pick a file"
+                    Margin="0, 20, 0, 0"/>
+            <Image x:Name="MainImage" 
+                   Margin="0, 20, 0, 0"
+                   Width="100"
+                   Height="100"/>
+        </StackPanel>
     </Grid>
 </Page>
