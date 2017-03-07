@@ -16,10 +16,31 @@
             <Button x:Name="PickButton"
                     Content="Pick a file"
                     Margin="0, 20, 0, 0"/>
-            <Image x:Name="MainImage" 
-                   Margin="0, 20, 0, 0"
-                   Width="100"
-                   Height="100"/>
+            <Grid Margin="0, 20, 0, 0"
+                  Width="100"
+                  Height="100"
+                  CornerRadius="10"
+                  Background="LightGray">
+                <TextBlock 
+                    TextAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="Your image" />
+                <Image 
+                    x:Name="MainImage"/>
+            </Grid>
+            <StackPanel Margin="0, 20"
+                        Orientation="Vertical">
+                <CheckBox
+                    x:Name="AndroidCheckBox"
+                    Content="Android"/>
+                <CheckBox x:Name="iOSCheckBox"
+                          Content="iOS" />
+                <CheckBox x:Name="WindowsUWPCheckbox"
+                          Content="Windows UWP" />
+            </StackPanel>
+            <Button
+                x:Name="CreateImagesButton"
+                Content="Create images"/>
         </StackPanel>
     </Grid>
 </Page>
