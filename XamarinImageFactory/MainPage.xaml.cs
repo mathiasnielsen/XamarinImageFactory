@@ -1,34 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
+using XamarinImageFactory.Common;
 
 namespace XamarinImageFactory
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
+        private StorageFolder _folder;
+        private string _fileName;
         private StorageFile _file;
+
+        private StorageFile _lowResult;
+        private StorageFile _mediumResult;
+        private StorageFile _highResult;
 
         public MainPage()
         {
@@ -41,11 +34,65 @@ namespace XamarinImageFactory
         {
             PickButton.Click += OnPickButtonClicked;
             CreateImagesButton.Click += OnCreateImagesButtonClicked;
+
+            LowQualityCheckbox.Checked += OnLowQualitySelected;
+            MediumQualityCheckbox.Checked += OnMediumQualitySelected;
+            HighQualityCheckbox.Checked += OnHighQualitySelected;
+        }
+
+        private async void OnLowQualitySelected(object sender, RoutedEventArgs e)
+        {
+            await SetResultImageAsync(_lowResult);
+        }
+
+        private async void OnMediumQualitySelected(object sender, RoutedEventArgs e)
+        {
+            await SetResultImageAsync(_mediumResult);
+        }
+
+        private async void OnHighQualitySelected(object sender, RoutedEventArgs e)
+        {
+            await SetResultImageAsync(_highResult);
+        }
+
+        private async Task SetResultImageAsync(StorageFile resultFile)
+        {
+            if (resultFile != null)
+            {
+                var img = new BitmapImage();
+                img = await LoadImage(resultFile);
+                ResultImage.Source = img;
+            }
         }
 
         private async void OnCreateImagesButtonClicked(object sender, RoutedEventArgs e)
         {
+            _folder = await CreateFolderForImagesAsync();
+            if (_folder == null)
+            {
+                // Cancelled.
+                return;
+            }
+
+            ProgressView.Visibility = Visibility.Visible;
             await StartCreatingImages();
+
+            SetInitialResult();
+            _folder = null;
+
+            ProgressView.Visibility = Visibility.Collapsed;
+        }
+
+        private void SetInitialResult()
+        {
+            if (MediumQualityCheckbox.IsChecked == true)
+            {
+                OnMediumQualitySelected(this, null);
+            }
+            else
+            {
+                MediumQualityCheckbox.IsChecked = true;
+            }
         }
 
         private async void OnPickButtonClicked(object sender, RoutedEventArgs e)
@@ -81,24 +128,118 @@ namespace XamarinImageFactory
             return bitmapImage;
         }
 
+        private string GetFileName()
+        {
+            var fileName = string.IsNullOrWhiteSpace(FolderNameTextBox.Text) ? Guid.NewGuid().ToString() : FolderNameTextBox.Text;
+            return $"{fileName}.png";
+        }
+
         private async Task StartCreatingImages()
         {
-            var folder = await CreateFolderForImagesAsync();
+            _fileName = GetFileName();
+
+            var mainFile = await _folder.CreateFileAsync(_fileName, CreationCollisionOption.ReplaceExisting);
+
+            await SaveStorageFileAsync(mainFile, _file);
 
             if (AndroidCheckBox.IsChecked == true)
             {
-                var androidFolder = await folder.CreateFolderAsync("Android");
-                var androidImageFile = await androidFolder.CreateFileAsync("test.png");
-                await ResizeImageAsync(_file, androidImageFile);
+                await CreateAndroidFilesAsync(_fileName, _folder);
             }
         }
 
-        private async Task ResizeImageAsync(StorageFile sourceFile, StorageFile destinationFile)
+        private async Task CreateAndroidFilesAsync(string fileName, StorageFolder folder)
+        {
+            var androidFolder = await folder.CreateFolderAsync("Android", CreationCollisionOption.ReplaceExisting);
+
+            _lowResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.LDPI);
+            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.MDPI);
+            _mediumResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.HDPI);
+            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XHDPI);
+            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XXHDPI);
+            _highResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XXXHDPI);
+        }
+
+        private async Task<StorageFile> CreateAndroidFileAsync(StorageFolder androidFolder, string fileName, ImageTypes imageType)
+        {
+            var imageTypeName = ImageTypes.GetName(typeof(ImageTypes), imageType);
+            var androidDrawableFolder = await androidFolder.CreateFolderAsync(imageTypeName, CreationCollisionOption.ReplaceExisting);
+            var androidImageFile = await androidDrawableFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+            await ResizeImageAsync(_file, androidImageFile, imageType);
+            await SaveStorageFileAsync(androidImageFile);
+
+            return androidImageFile;
+        }
+
+        private async Task SaveStorageFileAsync(StorageFile destinationFile, StorageFile file)
+        {
+            byte[] buffer;
+            Stream stream = await file.OpenStreamForReadAsync();
+            buffer = new byte[stream.Length];
+            await stream.ReadAsync(buffer, 0, (int)stream.Length);
+
+            await FileIO.WriteBytesAsync(destinationFile, buffer);
+        }
+
+        private async Task SaveStorageFileAsync(StorageFile file)
+        {
+            byte[] buffer;
+            Stream stream = await file.OpenStreamForReadAsync();
+            buffer = new byte[stream.Length];
+            await stream.ReadAsync(buffer, 0, (int)stream.Length);
+
+            await FileIO.WriteBytesAsync(file, buffer);
+        }
+
+        private async Task<Size> GetAndroidImageSizeAsycn(ImageTypes imageType)
+        {
+            var imageProperties = await _file.Properties.GetImagePropertiesAsync();
+            var imageSize = new Size(imageProperties.Width, imageProperties.Height);
+
+            var size = Size.Empty;
+            var factor = 1.0f;
+            switch (imageType)
+            {
+                case ImageTypes.LDPI:
+                    factor = 0.75f / 4.0f;
+                    break;
+
+                case ImageTypes.MDPI:
+                    factor = 1.0f / 4.0f;
+                    break;
+
+                case ImageTypes.HDPI:
+                    factor = 1.5f / 4.0f;
+                    break;
+
+                case ImageTypes.XHDPI:
+                    factor = 2.0f / 4.0f;
+                    break;
+
+                case ImageTypes.XXHDPI:
+                    factor = 3.0f / 4.0f;
+                    break;
+
+                case ImageTypes.XXXHDPI:
+                    factor = 4.0f / 4.0f;
+                    break;
+            }
+
+            size.Height = imageSize.Height * factor;
+            size.Width = imageSize.Width * factor;
+
+            return size;
+        }
+
+        private async Task<StorageFile> ResizeImageAsync(StorageFile sourceFile, StorageFile destinationFile, ImageTypes imageType)
         {
             using (var sourceStream = await sourceFile.OpenAsync(FileAccessMode.Read))
             {
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(sourceStream);
-                BitmapTransform transform = new BitmapTransform() { ScaledHeight = 80, ScaledWidth = 80 };
+
+                var scaledSize = await GetAndroidImageSizeAsycn(imageType);
+                BitmapTransform transform = new BitmapTransform() { ScaledHeight = (uint)scaledSize.Height, ScaledWidth = (uint)scaledSize.Width };
                 PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
                     BitmapPixelFormat.Rgba8,
                     BitmapAlphaMode.Straight,
@@ -108,15 +249,35 @@ namespace XamarinImageFactory
 
                 using (var destinationStream = await destinationFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
-                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, destinationStream);
+                    var bitmapEncoderId = GetBitmapEncoderIdBasedOnExtension(sourceFile.Name);
+                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(bitmapEncoderId, destinationStream);
 
                     var detachedPixelData = pixelData.DetachPixelData();
-                    encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Premultiplied, 80, 80, 96, 96, detachedPixelData);
+                    encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Premultiplied, (uint)scaledSize.Width, (uint)scaledSize.Height, 96, 96, detachedPixelData);
                     await encoder.FlushAsync();
                 }
 
-                var test = destinationFile;
+                return destinationFile;
             }
+        }
+
+        private Guid GetBitmapEncoderIdBasedOnExtension(string filename)
+        {
+            var bitmapEncoder = BitmapEncoder.PngEncoderId;
+
+            var extension = Path.GetExtension(filename);
+            switch(extension)
+            {
+                case ".png":
+                    bitmapEncoder = BitmapEncoder.PngEncoderId;
+                    break;
+
+                case ".jpg":
+                    bitmapEncoder = BitmapEncoder.JpegEncoderId;
+                    break;
+            }
+
+            return bitmapEncoder;
         }
 
         private async Task SaveFileAsync(StorageFolder folder, string filename)
@@ -126,10 +287,10 @@ namespace XamarinImageFactory
 
         private async Task<StorageFolder> CreateFolderForImagesAsync()
         {
-            var folderName = string.IsNullOrWhiteSpace(FolderNameTextBox.Text) ? Guid.NewGuid().ToString() : FolderNameTextBox.Text;
-            var folder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+            var picFolder = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Pictures);
+            var yourFolder = await picFolder.RequestAddFolderAsync();
 
-            return folder;
+            return yourFolder;
         }
     }
 }
