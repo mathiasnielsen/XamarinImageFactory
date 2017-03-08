@@ -1,113 +1,96 @@
-﻿<Page
-    x:Class="XamarinImageFactory.MainPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:XamarinImageFactory"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+﻿<Page x:Class="XamarinImageFactory.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:XamarinImageFactory"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           MinHeight="200"
           MinWidth="200">
         <Grid Margin="20">
             <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-            <TextBox 
-                x:Name="FolderNameTextBox"
-                Grid.Row="0"
-                PlaceholderText="Write foldername here..."/>
-            <Button 
-                x:Name="PickButton"
-                Grid.Row="1"
-                Content="Pick a file"
-                Margin="0, 20, 0, 0"/>
-            <Grid 
-                Grid.Row="2"
-                Margin="0, 20, 0, 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid 
-                    Grid.Column="0"
-                    Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid CornerRadius="10"
-                          Background="LightGray">
-                        <TextBlock TextAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Text="Your image" />
-                        <Image x:Name="MainImage" />
-                    </Grid>
-                    <TextBlock 
-                        x:Name="FileInfoTextBlock"
-                        Text="Image info"
-                        Grid.Row="1"/>
-                </Grid>
-                <Grid Grid.Column="1"
-                      Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid CornerRadius="10"
-                          Background="LightGray">
-                        <TextBlock TextAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Text="Result image" />
-                        <Image x:Name="ResultImage" />
-                    </Grid>
-                    <TextBlock x:Name="ResultFileInfoTextBlock"
-                               Text="Result image info"
-                               Grid.Row="1" />
-                </Grid>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="FolderNameTextBox"
+                     Grid.Row="0"
+                     Grid.ColumnSpan="3"
+                     PlaceholderText="Write foldername here..." />
+            <Button x:Name="PickButton"
+                    Grid.Row="1"
+                    HorizontalAlignment="Stretch"
+                    Content="Pick a file"
+                    Margin="0, 20, 0, 0" />
+            <Grid Grid.Row="2"
+                  Margin="0, 20"
+                  CornerRadius="10"
+                  Background="LightGray">
+                <TextBlock TextAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Your image" />
+                <Image x:Name="MainImage" />
             </Grid>
-            <Grid Grid.Row="3"
-                  Margin="0, 20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Vertical">
-                    <CheckBox x:Name="AndroidCheckBox"
-                              Content="Android" />
-                    <CheckBox x:Name="iOSCheckBox"
-                              Content="iOS" />
-                    <CheckBox x:Name="WindowsUWPCheckbox"
-                              Content="Windows UWP" />
-                </StackPanel>
-                <StackPanel 
-                    x:Name="RadioButtonContainer"
-                    Grid.Column="1"
-                            Orientation="Vertical">
-                    <RadioButton x:Name="LowQualityCheckbox"
-                                 GroupName="Quality"
-                                 Content="Low quality"/>
-                    <RadioButton x:Name="MediumQualityCheckbox"
-                                 GroupName="Quality"
-                                 Content="Medium quality" />
-                    <RadioButton x:Name="HighQualityCheckbox"
-                                 GroupName="Quality"
-                                 Content="High quality" />
-                </StackPanel>
+            <Grid Grid.Row="2"
+                  Grid.Column="2"
+                  Margin="0, 20"
+                  CornerRadius="10"
+                  Background="LightGray">
+                <TextBlock TextAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Result image" />
+                <Image x:Name="ResultImage" />
             </Grid>
-            <Button 
-            x:Name="CreateImagesButton"
-            Grid.Row="4"
-            Content="Create images" />
+            <TextBlock x:Name="FileInfoTextBlock"
+                       Grid.Row="3"
+                       Text="Image info" />
+            <TextBlock x:Name="ResultFileInfoTextBlock"
+                       Text="Result image info"
+                       Grid.Row="3"
+                       Grid.Column="2" />
+            <StackPanel Grid.Row="4"
+                        Grid.Column="0"
+                        Margin="0, 20, 0, 0"
+                        Orientation="Vertical">
+                <CheckBox x:Name="AndroidCheckBox"
+                          Content="Android" />
+                <CheckBox x:Name="iOSCheckBox"
+                          Content="iOS" />
+                <CheckBox x:Name="WindowsUWPCheckbox"
+                          Content="Windows UWP" />
+            </StackPanel>
+            <StackPanel x:Name="RadioButtonContainer"
+                        Margin="0, 20, 0, 0"
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        Orientation="Vertical">
+                <RadioButton x:Name="LowQualityCheckbox"
+                             GroupName="Quality"
+                             Content="Low quality" />
+                <RadioButton x:Name="MediumQualityCheckbox"
+                             GroupName="Quality"
+                             Content="Medium quality" />
+                <RadioButton x:Name="HighQualityCheckbox"
+                             GroupName="Quality"
+                             Content="High quality" />
+            </StackPanel>
+            <Button x:Name="CreateImagesButton"
+                    Grid.Row="5"
+                    Margin="0, 20, 0, 0"
+                    Content="Create images" />
         </Grid>
-        <Grid 
-            x:Name="ProgressView"
-            Visibility="Collapsed"
-            Background="Black"
+        <Grid x:Name="ProgressView"
+              Visibility="Collapsed"
+              Background="Black"
               Opacity="0.3">
             <ProgressRing IsActive="True" />
         </Grid>
