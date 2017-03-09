@@ -52,7 +52,7 @@ namespace XamarinImageFactory
                 }
 
                 // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
+                Window.Current.Content = new MainPage(rootFrame);
             }
 
             if (e.PrelaunchActivated == false)

@@ -5,94 +5,151 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-          MinHeight="200"
-          MinWidth="200">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="20" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="FolderNameTextBox"
-                     Grid.Row="0"
-                     Grid.ColumnSpan="3"
-                     PlaceholderText="Write foldername here..." />
-            <Button x:Name="PickButton"
-                    Grid.Row="1"
-                    HorizontalAlignment="Stretch"
-                    Content="Pick a file"
-                    Margin="0, 20, 0, 0" />
-            <Grid Grid.Row="2"
-                  Margin="0, 20"
-                  CornerRadius="10"
-                  Background="LightGray">
-                <TextBlock TextAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="Your image" />
-                <Image x:Name="MainImage" />
-            </Grid>
-            <Grid Grid.Row="2"
-                  Grid.Column="2"
-                  Margin="0, 20"
-                  CornerRadius="10"
-                  Background="LightGray">
-                <TextBlock TextAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="Result image" />
-                <Image x:Name="ResultImage" />
-            </Grid>
-            <TextBlock x:Name="FileInfoTextBlock"
-                       Grid.Row="3"
-                       Text="Image info" />
-            <TextBlock x:Name="ResultFileInfoTextBlock"
-                       Text="Result image info"
-                       Grid.Row="3"
-                       Grid.Column="2" />
-            <StackPanel Grid.Row="4"
-                        Grid.Column="0"
-                        Margin="0, 20, 0, 0"
-                        Orientation="Vertical">
-                <CheckBox x:Name="AndroidCheckBox"
-                          Content="Android" />
-                <CheckBox x:Name="iOSCheckBox"
-                          Content="iOS" />
-                <CheckBox x:Name="WindowsUWPCheckbox"
-                          Content="Windows UWP" />
+    <Page.Resources>
+        <ResourceDictionary>
+            <SolidColorBrush x:Key="NavButtonPressedBackgroundBrush"
+                             Color="White"
+                             Opacity="0.3" />
+            <SolidColorBrush x:Key="NavButtonCheckedBackgroundBrush"
+                             Color="White"
+                             Opacity="0.2" />
+            <SolidColorBrush x:Key="NavButtonHoverBackgroundBrush"
+                             Color="White"
+                             Opacity="0.1" />
+            <Style x:Key="NavRadioButtonStyle"
+                   TargetType="RadioButton">
+                <Setter Property="Background"
+                        Value="Transparent" />
+                <Setter Property="Padding"
+                        Value="3" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Stretch" />
+                <Setter Property="VerticalAlignment"
+                        Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Stretch" />
+                <Setter Property="VerticalContentAlignment"
+                        Value="Center" />
+                <Setter Property="Height"
+                        Value="50" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                               Storyboard.TargetName="BackgroundGrid">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{StaticResource NavButtonHoverBackgroundBrush}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                               Storyboard.TargetName="BackgroundGrid">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{StaticResource NavButtonPressedBackgroundBrush}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled" />
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                               Storyboard.TargetName="SelectedBackground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{StaticResource NavButtonCheckedBackgroundBrush}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                               Storyboard.TargetName="SelectedBackground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{TemplateBinding Background}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Indeterminate" />
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="FocusStates">
+                                        <VisualState x:Name="Focused" />
+                                        <VisualState x:Name="Unfocused" />
+                                        <VisualState x:Name="PointerFocused" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid Name="SelectedBackground">
+                                    <Grid Name="BackgroundGrid"
+                                          Background="Transparent"
+                                          VerticalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="48" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{TemplateBinding Tag}"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                        <ContentPresenter x:Name="ContentPresenter"
+                                                          AutomationProperties.AccessibilityView="Raw"
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                          Content="{TemplateBinding Content}"
+                                                          Grid.Column="1"
+                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                          Margin="{TemplateBinding Padding}"
+                                                          TextWrapping="Wrap"
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+    <SplitView x:Name="ShellSplitView"
+               DisplayMode="CompactOverlay"
+               IsPaneOpen="False"
+               CompactPaneLength="50"
+               OpenPaneLength="150">
+        <SplitView.Pane>
+            <StackPanel Background="LightGray">
+                <RadioButton x:Name="HamburgerButton"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Tag="&#xE700;"
+                             GroupName="Burger"
+                             Click="OnMenuButtonClicked" />
+                <RadioButton x:Name="HomeRadioButton"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Tag="&#xE10F;"
+                             Content="Home"
+                             GroupName="Navigation"
+                             Checked="OnHomeButtonChecked" />
+                <RadioButton x:Name="IconsRadioButton"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Tag="&#xE9D9;"
+                             Content="Icons"
+                             GroupName="Navigation"
+                             Checked="OnIconButtonChecked" />
+                <RadioButton x:Name="SettingsRadioButton"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Tag="&#xE115;"
+                             Content="Settings"
+                             GroupName="Navigation"
+                             Checked="OnSettingsButtonChecked" />
             </StackPanel>
-            <StackPanel x:Name="RadioButtonContainer"
-                        Margin="0, 20, 0, 0"
-                        Grid.Row="4"
-                        Grid.Column="2"
-                        Orientation="Vertical">
-                <RadioButton x:Name="LowQualityCheckbox"
-                             GroupName="Quality"
-                             Content="Low quality" />
-                <RadioButton x:Name="MediumQualityCheckbox"
-                             GroupName="Quality"
-                             Content="Medium quality" />
-                <RadioButton x:Name="HighQualityCheckbox"
-                             GroupName="Quality"
-                             Content="High quality" />
-            </StackPanel>
-            <Button x:Name="CreateImagesButton"
-                    Grid.Row="5"
-                    Margin="0, 20, 0, 0"
-                    Content="Create images" />
-        </Grid>
-        <Grid x:Name="ProgressView"
-              Visibility="Collapsed"
-              Background="Black"
-              Opacity="0.3">
-            <ProgressRing IsActive="True" />
-        </Grid>
-    </Grid>
+        </SplitView.Pane>
+    </SplitView>
 </Page>
