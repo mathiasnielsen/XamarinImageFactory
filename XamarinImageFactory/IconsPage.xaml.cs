@@ -6,6 +6,8 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
+using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -21,6 +23,7 @@ namespace XamarinImageFactory
     /// </summary>
     public sealed partial class IconsPage : Page
     {
+        private StorageFolder _lastUsedFolder;
         private StorageFolder _folder;
         private string _name;
         private StorageFile _file;
@@ -32,6 +35,9 @@ namespace XamarinImageFactory
 
         private IOSImageFactory _iosImageFactory;
         private IOSAssetsResult _iosImageResults;
+
+        private WindowsImageFactory _windowsImageFactory;
+        private WindowsAssetsResult _windowsImageResults;
 
         private ImageResult _lowImageResult;
         private ImageResult _mediumImageResult;
@@ -50,10 +56,13 @@ namespace XamarinImageFactory
         private void Initialize()
         {
             _androidImageFactory = new AndroidImageFactory();
-            _iosImageFactory = new IOSImageFactory();
-
             _androidImageResults = _androidImageFactory.CreateAndroidDrawables();
+
+            _iosImageFactory = new IOSImageFactory();
             _iosImageResults = _iosImageFactory.CreateIOSResult();
+
+            _windowsImageFactory = new WindowsImageFactory();
+            _windowsImageResults = _windowsImageFactory.CreateWindowsAssetsResult();
 
             _lowImageResult = new ImageResult();
             _mediumImageResult = new ImageResult();
@@ -66,10 +75,24 @@ namespace XamarinImageFactory
 
             PickButton.Click += OnPickButtonClicked;
             CreateImagesButton.Click += OnCreateImagesButtonClicked;
+            ShowFolderButton.Click += OnShowFolderClicked;
 
             LowQualityCheckbox.Checked += OnLowQualitySelected;
             MediumQualityCheckbox.Checked += OnMediumQualitySelected;
             HighQualityCheckbox.Checked += OnHighQualitySelected;
+        }
+
+        private async void OnShowFolderClicked(object sender, RoutedEventArgs e)
+        {
+            if (_lastUsedFolder != null)
+            {
+                await Launcher.LaunchFolderAsync(_lastUsedFolder);
+            }
+            else
+            {
+                var messageDialog = new MessageDialog("You have no folder to show", "No folder");
+                var result = await messageDialog.ShowAsync();
+            }
         }
 
         private async void OnResultComboBoxChanged(object sender, SelectionChangedEventArgs e)
@@ -96,9 +119,9 @@ namespace XamarinImageFactory
                     break;
 
                 case PlatformType.WINDOWS:
-                    ////_lowImageResult = _iosImageResults.Normal;
-                    ////_mediumImageResult = _iosImageResults.Twice;
-                    ////_highImageResult = _iosImageResults.Triple;
+                    _lowImageResult = _windowsImageResults.Image100;
+                    _mediumImageResult = _windowsImageResults.Image140;
+                    _highImageResult = _windowsImageResults.Image240;
                     break;
             }
         }
@@ -170,6 +193,20 @@ namespace XamarinImageFactory
 
         private async void OnCreateImagesButtonClicked(object sender, RoutedEventArgs e)
         {
+            if (_file == null)
+            {
+                var messageDialog = new MessageDialog("You have no selected file. Please select one first.", "No selected file");
+                await messageDialog.ShowAsync();
+                return;
+            }
+
+            if (iOSCheckBox.IsChecked == false && AndroidCheckBox.IsChecked == false && WindowsCheckBox.IsChecked == false)
+            {
+                var messageDialog = new MessageDialog("No image types are selected. What should we make?", "No image types");
+                await messageDialog.ShowAsync();
+                return;
+            }
+
             _name = GetName();
             _folder = await CreateFolderForImagesAsync();
             if (_folder == null)
@@ -183,7 +220,8 @@ namespace XamarinImageFactory
             await StartCreatingImages();
 
             SetInitialResult();
-            _folder = null;
+            _lastUsedFolder = _folder;
+            ResultTextBlock.Text = $"Images have been created in {_lastUsedFolder.Path}";
 
             ProgressView.Visibility = Visibility.Collapsed;
         }
@@ -213,7 +251,7 @@ namespace XamarinImageFactory
                 {
                     ResultComboBox.SelectedIndex = 1;
                 }
-                else if (WindowsUWPCheckbox.IsChecked == true)
+                else if (WindowsCheckBox.IsChecked == true)
                 {
                     ResultComboBox.SelectedIndex = 2;
                 }
@@ -277,15 +315,30 @@ namespace XamarinImageFactory
             {
                 await CreateIOSFilesAsync(_folder);
             }
+
+            if (WindowsCheckBox.IsChecked == true)
+            {
+                await CreateWindowsFilesAsync(_folder);
+            }
+        }
+
+        private async Task CreateWindowsFilesAsync(StorageFolder folder)
+        {
+            var windowsFolder = await folder.CreateFolderAsync("Windows", CreationCollisionOption.GenerateUniqueName);
+
+            _windowsImageResults.Image100.File = await CreateWindowsFileAsync(windowsFolder, WindowsAssetTypes.Image100);
+            _windowsImageResults.Image140.File = await CreateWindowsFileAsync(windowsFolder, WindowsAssetTypes.Image140);
+            _windowsImageResults.Image180.File = await CreateWindowsFileAsync(windowsFolder, WindowsAssetTypes.Image180);
+            _windowsImageResults.Image240.File = await CreateWindowsFileAsync(windowsFolder, WindowsAssetTypes.Image240);
         }
 
         private async Task CreateIOSFilesAsync(StorageFolder folder)
         {
-            var androidFolder = await folder.CreateFolderAsync("IOS", CreationCollisionOption.GenerateUniqueName);
+            var iosFolder = await folder.CreateFolderAsync("IOS", CreationCollisionOption.GenerateUniqueName);
 
-            _iosImageResults.Image100.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image100);
-            _iosImageResults.Image200.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image200);
-            _iosImageResults.Image300.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image300);
+            _iosImageResults.Image100.File = await CreateIOSFileAsync(iosFolder, IOSAssetTypes.Image100);
+            _iosImageResults.Image200.File = await CreateIOSFileAsync(iosFolder, IOSAssetTypes.Image200);
+            _iosImageResults.Image300.File = await CreateIOSFileAsync(iosFolder, IOSAssetTypes.Image300);
         }
 
         private async Task CreateAndroidFilesAsync(string fileName, StorageFolder folder)
@@ -298,6 +351,18 @@ namespace XamarinImageFactory
             _androidImageResults.XHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XHDPI);
             _androidImageResults.XXHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XXHDPI);
             _androidImageResults.XXXHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XXXHDPI);
+        }
+
+        private async Task<StorageFile> CreateWindowsFileAsync(StorageFolder windowsFolder, WindowsAssetTypes imageType)
+        {
+            var fileName = GetWindowsFileName(imageType);
+            var windowsFile = await windowsFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+            var scaledSize = await GetWindowsImageSizeAsync(imageType);
+            await ResizeImageAsync(_file, windowsFile, scaledSize);
+            await SaveStorageFileAsync(windowsFile);
+
+            return windowsFile;
         }
 
         private async Task<StorageFile> CreateIOSFileAsync(StorageFolder iosFolder, IOSAssetTypes imageType)
@@ -315,7 +380,8 @@ namespace XamarinImageFactory
         private async Task<StorageFile> CreateAndroidFileAsync(StorageFolder androidFolder, string fileName, AndroidDrawableTypes imageType)
         {
             var imageTypeName = AndroidDrawableTypes.GetName(typeof(AndroidDrawableTypes), imageType);
-            var androidDrawableFolder = await androidFolder.CreateFolderAsync(imageTypeName, CreationCollisionOption.ReplaceExisting);
+            var lowerLettersImageTypeName = imageTypeName.ToLower();
+            var androidDrawableFolder = await androidFolder.CreateFolderAsync(lowerLettersImageTypeName, CreationCollisionOption.ReplaceExisting);
             var androidImageFile = await androidDrawableFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
             var scaledSize = await GetAndroidImageSizeAsycn(imageType);
@@ -323,6 +389,31 @@ namespace XamarinImageFactory
             await SaveStorageFileAsync(androidImageFile);
 
             return androidImageFile;
+        }
+
+        private string GetWindowsFileName(WindowsAssetTypes windowsImageType)
+        {
+            var fileName = _name;
+            switch (windowsImageType)
+            {
+                case WindowsAssetTypes.Image100:
+                    fileName = $"{fileName}.scale-100.png";
+                    break;
+
+                case WindowsAssetTypes.Image140:
+                    fileName = $"{fileName}.scale-140.png";
+                    break;
+
+                case WindowsAssetTypes.Image180:
+                    fileName = $"{fileName}.scale-180.png";
+                    break;
+
+                case WindowsAssetTypes.Image240:
+                    fileName = $"{fileName}.scale-240.png";
+                    break;
+            }
+
+            return fileName;
         }
 
         private string GetIOSFileName(IOSAssetTypes iosType)
@@ -364,6 +455,38 @@ namespace XamarinImageFactory
             await stream.ReadAsync(buffer, 0, (int)stream.Length);
 
             await FileIO.WriteBytesAsync(file, buffer);
+        }
+
+        private async Task<Size> GetWindowsImageSizeAsync(WindowsAssetTypes imageType)
+        {
+            var imageProperties = await _file.Properties.GetImagePropertiesAsync();
+            var imageSize = new Size(imageProperties.Width, imageProperties.Height);
+
+            var size = Size.Empty;
+            var factor = 1.0f;
+            switch (imageType)
+            {
+                case WindowsAssetTypes.Image100:
+                    factor = 1.0f / 4.0f;
+                    break;
+
+                case WindowsAssetTypes.Image140:
+                    factor = 1.4f / 4.0f;
+                    break;
+
+                case WindowsAssetTypes.Image180:
+                    factor = 1.8f / 4.0f;
+                    break;
+
+                case WindowsAssetTypes.Image240:
+                    factor = 2.4f / 4.0f;
+                    break;
+            }
+
+            size.Height = imageSize.Height * factor;
+            size.Width = imageSize.Width * factor;
+
+            return size;
         }
 
         private async Task<Size> GetIOSImageSizeAsync(IOSAssetTypes imageType)
@@ -490,8 +613,12 @@ namespace XamarinImageFactory
         {
             var picFolder = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Pictures);
             var selectedFolder = await picFolder.RequestAddFolderAsync();
+            if (selectedFolder == null)
+            {
+                return null;
+            }
 
-            var imageFolder = await selectedFolder.CreateFolderAsync(_name);
+            var imageFolder = await selectedFolder.CreateFolderAsync(_name, CreationCollisionOption.GenerateUniqueName);
 
             return imageFolder;
         }

@@ -101,6 +101,7 @@
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center" />
                                         <ContentPresenter x:Name="ContentPresenter"
+                                                          
                                                           AutomationProperties.AccessibilityView="Raw"
                                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                                           ContentTransitions="{TemplateBinding ContentTransitions}"
@@ -133,6 +134,8 @@
                 </Grid.RowDefinitions>
                 <RadioButton x:Name="HamburgerButton"
                              Style="{StaticResource NavRadioButtonStyle}"
+                             Background="Gray"
+                             Foreground="White"
                              Tag="&#xE700;"
                              GroupName="Burger"
                              Click="OnMenuButtonClicked" />

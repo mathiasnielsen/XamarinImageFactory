@@ -10,12 +10,10 @@ namespace XamarinImageFactory.Models
     {
         public ImageResult Image100 { get; set; }
 
-        public ImageResult Image125 { get; set; }
+        public ImageResult Image140 { get; set; }
 
-        public ImageResult Image150 { get; set; }
+        public ImageResult Image180 { get; set; }
 
-        public ImageResult Image200 { get; set; }
-
-        public ImageResult Image400 { get; set; }
+        public ImageResult Image240 { get; set; }
     }
 }

@@ -16,6 +16,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -78,9 +79,9 @@
                 <CheckBox x:Name="iOSCheckBox"
                           IsChecked="True"
                           Content="iOS" />
-                <CheckBox x:Name="WindowsUWPCheckbox"
+                <CheckBox x:Name="WindowsCheckBox"
                           IsChecked="True"
-                          Content="Windows UWP" />
+                          Content="Windows" />
             </StackPanel>
             <StackPanel x:Name="RadioButtonContainer"
                         Margin="0, 20, 0, 0"
@@ -101,20 +102,36 @@
                     Grid.Row="5"
                     Margin="0, 20, 0, 0"
                     Content="Create images" />
-            <TextBlock x:Name="LittleGirl"
-                       FontFamily="Segoe MDL2 Assets"
-                       Text="&#xED53;"
-                       Grid.Row="5"
-                       Visibility="Visible"
-                       VerticalAlignment="Bottom"
-                       HorizontalAlignment="Right"
-                       Grid.Column="2" />
+            <Button x:Name="ShowFolderButton"
+                    Content="Show folder"
+                    Margin="0, 20, 0, 0"
+                    Grid.Row="5"
+                    Grid.Column="2" />
+            <TextBlock x:Name="ResultTextBlock"
+                       Margin="0, 20, 0, 0"
+                       Text="Currently no files have been created"
+                       Grid.Row="6"
+                       Grid.ColumnSpan="3"/>
         </Grid>
+        <TextBlock x:Name="LittleGirl"
+                   Width="20"
+                   Height="20"
+                   FontFamily="Segoe MDL2 Assets"
+                   Text="&#xED53;"
+                   Grid.Row="5"
+                   Visibility="Visible"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Right"
+                   Grid.Column="2" />
         <Grid x:Name="ProgressView"
               Visibility="Collapsed"
               Background="Black"
-              Opacity="0.3">
-            <ProgressRing IsActive="True" />
+              Opacity="0.5">
+            <ProgressRing 
+                Foreground="White"
+                Width="50"
+                Height="50"
+                IsActive="True" />
         </Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

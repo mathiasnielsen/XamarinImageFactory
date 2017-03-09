@@ -10,8 +10,11 @@ namespace XamarinImageFactory.Common
     {
         Image100,
         Image125,
+        Image140,
         Image150,
+        Image180,
         Image200,
+        Image240,
         Image400
     }
 }

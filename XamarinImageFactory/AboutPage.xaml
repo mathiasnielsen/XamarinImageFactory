@@ -5,6 +5,23 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <Thickness x:Key="LinkSpacing">0, 10, 0, 0</Thickness>
+            <Style x:Key="LinkHeaderTextBlockStyle"
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Margin"
+                        Value="{StaticResource LinkSpacing}" />
+            </Style>
+            <Style x:Key="LinkTextBlockStyle"
+                   TargetType="TextBlock"
+                   BasedOn="{StaticResource CaptionTextBlockStyle}">
+                <Setter Property="TextWrapping"
+                        Value="Wrap" />
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer>
             <StackPanel Margin="20">
@@ -16,11 +33,14 @@
                 <StackPanel Margin="0, 20, 0, 0">
                     <TextBlock Style="{StaticResource SubheaderTextBlockStyle}"
                                Text="References:" />
-                    <TextBlock Style="{StaticResource BodyTextBlockStyle}"
+                    <TextBlock Style="{StaticResource LinkHeaderTextBlockStyle}"
                                Text="Xamarin images" />
-                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
-                               TextWrapping="Wrap"
+                    <TextBlock Style="{StaticResource LinkTextBlockStyle}"
                                Text="https://developer.xamarin.com/guides/xamarin-forms/user-interface/images/#Local_Images" />
+                    <TextBlock Style="{StaticResource LinkHeaderTextBlockStyle}"
+                               Text="Windows images scaling" />
+                    <TextBlock Style="{StaticResource LinkTextBlockStyle}"
+                               Text="https://msdn.microsoft.com/en-us/library/windows/apps/xaml/hh965325.aspx" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

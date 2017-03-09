@@ -9,9 +9,21 @@ namespace XamarinImageFactory.Factories
 {
     public class WindowsImageFactory
     {
-        public WindowsAssetsResult CreateUWPIAssetsResult()
+        public WindowsAssetsResult CreateWindowsAssetsResult()
         {
             var result = new WindowsAssetsResult();
+
+            result.Image100 = new ImageResult();
+            result.Image140 = new ImageResult();
+            result.Image180 = new ImageResult();
+            result.Image240 = new ImageResult();
+
+            return result;
+        }
+
+        public WindowsTilesResult CreateWindowsTilesResult()
+        {
+            var result = new WindowsTilesResult();
 
             result.Image100 = new ImageResult();
             result.Image125 = new ImageResult();
