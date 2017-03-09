@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XamarinImageFactory.Common
 {
-    public enum ImageTypes
+    public enum AndroidDrawableTypes
     {
         LDPI,
         MDPI,

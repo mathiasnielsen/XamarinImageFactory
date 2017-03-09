@@ -10,6 +10,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using XamarinImageFactory.Common;
+using XamarinImageFactory.Factories;
+using XamarinImageFactory.Models;
+using XamarinImageFactory.Utitlities;
 
 namespace XamarinImageFactory
 {
@@ -19,15 +22,27 @@ namespace XamarinImageFactory
         private string _fileName;
         private StorageFile _file;
 
-        private StorageFile _lowResult;
-        private StorageFile _mediumResult;
-        private StorageFile _highResult;
+        private AndroidImageFactory _androidImageFactory;
+        private AndroidDrawablesResult _drawableResults;
+
+        private IOSImageFactory _iosImageFactory;
+        private IOSAssetsResult _iosImageResults;
 
         public MainPage()
         {
             this.InitializeComponent();
 
             PrepareUIElements();
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            _androidImageFactory = new AndroidImageFactory();
+            _iosImageFactory = new IOSImageFactory();
+
+            _drawableResults = _androidImageFactory.CreateAndroidDrawables();
+            _iosImageResults = _iosImageFactory.CreateIOSResult();
         }
 
         private void PrepareUIElements()
@@ -42,17 +57,20 @@ namespace XamarinImageFactory
 
         private async void OnLowQualitySelected(object sender, RoutedEventArgs e)
         {
-            await SetResultImageAsync(_lowResult);
+            var file = _drawableResults.LDPI.File;
+            await SetResultImageAsync(file);
         }
 
         private async void OnMediumQualitySelected(object sender, RoutedEventArgs e)
         {
-            await SetResultImageAsync(_mediumResult);
+            var file = _drawableResults.HDPI.File;
+            await SetResultImageAsync(file);
         }
 
         private async void OnHighQualitySelected(object sender, RoutedEventArgs e)
         {
-            await SetResultImageAsync(_highResult);
+            var file = _drawableResults.XXXHDPI.File;
+            await SetResultImageAsync(file);
         }
 
         private async Task SetResultImageAsync(StorageFile resultFile)
@@ -71,40 +89,12 @@ namespace XamarinImageFactory
         {
             var name = file.Name;
             var properties = await file.GetBasicPropertiesAsync();
-            var understandableSize = SizeSuffix((long)properties.Size, 2);
+            var understandableSize = FileSizeConverter.SizeSuffix((long)properties.Size, 2);
 
             var width = bitmap.PixelWidth;
             var height = bitmap.PixelHeight;
 
             return $"Name: {name}\nImageSize: {width}x{height}\nFileSize: {understandableSize}";
-        }
-
-        static readonly string[] SizeSuffixes =
-                   { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-        static string SizeSuffix(Int64 value, int decimalPlaces = 1)
-        {
-            if (value < 0) { return "-" + SizeSuffix(-value); }
-            if (value == 0) { return "0.0 bytes"; }
-
-            // mag is 0 for bytes, 1 for KB, 2, for MB, etc.
-            int mag = (int)Math.Log(value, 1024);
-
-            // 1L << (mag * 10) == 2 ^ (10 * mag) 
-            // [i.e. the number of bytes in the unit corresponding to mag]
-            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
-
-            // make adjustment when the value is large enough that
-            // it would round up to 1000 or more
-            if (Math.Round(adjustedSize, decimalPlaces) >= 1000)
-            {
-                mag += 1;
-                adjustedSize /= 1024;
-            }
-
-            return string.Format("{0:n" + decimalPlaces + "} {1}",
-                adjustedSize,
-                SizeSuffixes[mag]);
         }
 
         private async void OnCreateImagesButtonClicked(object sender, RoutedEventArgs e)
@@ -196,17 +186,17 @@ namespace XamarinImageFactory
         {
             var androidFolder = await folder.CreateFolderAsync("Android", CreationCollisionOption.ReplaceExisting);
 
-            _lowResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.LDPI);
-            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.MDPI);
-            _mediumResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.HDPI);
-            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XHDPI);
-            await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XXHDPI);
-            _highResult = await CreateAndroidFileAsync(androidFolder, fileName, ImageTypes.XXXHDPI);
+            _drawableResults.LDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.LDPI);
+            _drawableResults.MDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.MDPI);
+            _drawableResults.HDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.HDPI);
+            _drawableResults.XHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XHDPI);
+            _drawableResults.XXHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XXHDPI);
+            _drawableResults.XXXHDPI.File = await CreateAndroidFileAsync(androidFolder, fileName, AndroidDrawableTypes.XXXHDPI);
         }
 
-        private async Task<StorageFile> CreateAndroidFileAsync(StorageFolder androidFolder, string fileName, ImageTypes imageType)
+        private async Task<StorageFile> CreateAndroidFileAsync(StorageFolder androidFolder, string fileName, AndroidDrawableTypes imageType)
         {
-            var imageTypeName = ImageTypes.GetName(typeof(ImageTypes), imageType);
+            var imageTypeName = AndroidDrawableTypes.GetName(typeof(AndroidDrawableTypes), imageType);
             var androidDrawableFolder = await androidFolder.CreateFolderAsync(imageTypeName, CreationCollisionOption.ReplaceExisting);
             var androidImageFile = await androidDrawableFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
@@ -236,7 +226,7 @@ namespace XamarinImageFactory
             await FileIO.WriteBytesAsync(file, buffer);
         }
 
-        private async Task<Size> GetAndroidImageSizeAsycn(ImageTypes imageType)
+        private async Task<Size> GetAndroidImageSizeAsycn(AndroidDrawableTypes imageType)
         {
             var imageProperties = await _file.Properties.GetImagePropertiesAsync();
             var imageSize = new Size(imageProperties.Width, imageProperties.Height);
@@ -245,27 +235,27 @@ namespace XamarinImageFactory
             var factor = 1.0f;
             switch (imageType)
             {
-                case ImageTypes.LDPI:
+                case AndroidDrawableTypes.LDPI:
                     factor = 0.75f / 4.0f;
                     break;
 
-                case ImageTypes.MDPI:
+                case AndroidDrawableTypes.MDPI:
                     factor = 1.0f / 4.0f;
                     break;
 
-                case ImageTypes.HDPI:
+                case AndroidDrawableTypes.HDPI:
                     factor = 1.5f / 4.0f;
                     break;
 
-                case ImageTypes.XHDPI:
+                case AndroidDrawableTypes.XHDPI:
                     factor = 2.0f / 4.0f;
                     break;
 
-                case ImageTypes.XXHDPI:
+                case AndroidDrawableTypes.XXHDPI:
                     factor = 3.0f / 4.0f;
                     break;
 
-                case ImageTypes.XXXHDPI:
+                case AndroidDrawableTypes.XXXHDPI:
                     factor = 4.0f / 4.0f;
                     break;
             }
@@ -276,7 +266,7 @@ namespace XamarinImageFactory
             return size;
         }
 
-        private async Task<StorageFile> ResizeImageAsync(StorageFile sourceFile, StorageFile destinationFile, ImageTypes imageType)
+        private async Task<StorageFile> ResizeImageAsync(StorageFile sourceFile, StorageFile destinationFile, AndroidDrawableTypes imageType)
         {
             using (var sourceStream = await sourceFile.OpenAsync(FileAccessMode.Read))
             {

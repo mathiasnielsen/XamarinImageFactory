@@ -95,12 +95,18 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Common\ImageTypes.cs" />
-    <Compile Include="Entities\ImageResult.cs" />
+    <Compile Include="Common\AndroidDrawableTypes.cs" />
+    <Compile Include="Common\IOSAssetTypes.cs" />
+    <Compile Include="Factories\AndroidImageFactory.cs" />
+    <Compile Include="Factories\IOSImageFactory.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\ImageResult.cs" />
+    <Compile Include="Models\AndroidDrawablesResult.cs" />
+    <Compile Include="Models\IOSAssetsResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utitlities\FileSizeConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

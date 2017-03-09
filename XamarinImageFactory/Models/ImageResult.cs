@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using XamarinImageFactory.Common;
 
-namespace XamarinImageFactory.Entities
+namespace XamarinImageFactory.Models
 {
     public class ImageResult
     {
-        public StorageFile ImageFile { get; set; }
-
-        public ImageTypes ImageType { get; set; }
+        public StorageFile File { get; set; }
     }
 }
