@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 
 namespace XamarinImageFactory.Models
 {
-    public class IOSAssetsResult
+    public class WindowsAssetsResult
     {
         public ImageResult Image100 { get; set; }
 
+        public ImageResult Image125 { get; set; }
+
+        public ImageResult Image150 { get; set; }
+
         public ImageResult Image200 { get; set; }
 
-        public ImageResult Image300 { get; set; }
+        public ImageResult Image400 { get; set; }
     }
 }

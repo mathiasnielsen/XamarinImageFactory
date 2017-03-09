@@ -8,9 +8,9 @@ namespace XamarinImageFactory.Factories
         {
             var result = new IOSAssetsResult();
 
-            result.Normal = new ImageResult();
-            result.Twice = new ImageResult();
-            result.Triple = new ImageResult();
+            result.Image100 = new ImageResult();
+            result.Image200 = new ImageResult();
+            result.Image300 = new ImageResult();
 
             return result;
         }

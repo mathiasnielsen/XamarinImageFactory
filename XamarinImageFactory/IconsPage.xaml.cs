@@ -90,9 +90,9 @@ namespace XamarinImageFactory
                     break;
 
                 case PlatformType.IOS:
-                    _lowImageResult = _iosImageResults.Normal;
-                    _mediumImageResult = _iosImageResults.Twice;
-                    _highImageResult = _iosImageResults.Triple;
+                    _lowImageResult = _iosImageResults.Image100;
+                    _mediumImageResult = _iosImageResults.Image200;
+                    _highImageResult = _iosImageResults.Image300;
                     break;
 
                 case PlatformType.WINDOWS:
@@ -283,9 +283,9 @@ namespace XamarinImageFactory
         {
             var androidFolder = await folder.CreateFolderAsync("IOS", CreationCollisionOption.GenerateUniqueName);
 
-            _iosImageResults.Normal.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Normal);
-            _iosImageResults.Twice.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Double);
-            _iosImageResults.Triple.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Triple);
+            _iosImageResults.Image100.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image100);
+            _iosImageResults.Image200.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image200);
+            _iosImageResults.Image300.File = await CreateIOSFileAsync(androidFolder, IOSAssetTypes.Image300);
         }
 
         private async Task CreateAndroidFilesAsync(string fileName, StorageFolder folder)
@@ -330,15 +330,15 @@ namespace XamarinImageFactory
             var fileName = _name;
             switch (iosType)
             {
-                case IOSAssetTypes.Normal:
+                case IOSAssetTypes.Image100:
                     fileName = $"{fileName}.png";
                     break;
 
-                case IOSAssetTypes.Double:
+                case IOSAssetTypes.Image200:
                     fileName = $"{fileName}@2.png";
                     break;
 
-                case IOSAssetTypes.Triple:
+                case IOSAssetTypes.Image300:
                     fileName = $"{fileName}@3.png";
                     break;
             }
@@ -375,15 +375,15 @@ namespace XamarinImageFactory
             var factor = 1.0f;
             switch (imageType)
             {
-                case IOSAssetTypes.Normal:
+                case IOSAssetTypes.Image100:
                     factor = 1.0f / 4.0f;
                     break;
 
-                case IOSAssetTypes.Double:
+                case IOSAssetTypes.Image200:
                     factor = 2.0f / 4.0f;
                     break;
 
-                case IOSAssetTypes.Triple:
+                case IOSAssetTypes.Image300:
                     factor = 3.0f / 4.0f;
                     break;
             }

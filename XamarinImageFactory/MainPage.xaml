@@ -125,31 +125,48 @@
                CompactPaneLength="50"
                OpenPaneLength="150">
         <SplitView.Pane>
-            <StackPanel Background="LightGray">
+            <Grid Background="LightGray">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <RadioButton x:Name="HamburgerButton"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Tag="&#xE700;"
                              GroupName="Burger"
                              Click="OnMenuButtonClicked" />
-                <RadioButton x:Name="HomeRadioButton"
-                             Style="{StaticResource NavRadioButtonStyle}"
-                             Tag="&#xE10F;"
-                             Content="Home"
-                             GroupName="Navigation"
-                             Checked="OnHomeButtonChecked" />
-                <RadioButton x:Name="IconsRadioButton"
-                             Style="{StaticResource NavRadioButtonStyle}"
-                             Tag="&#xE9D9;"
-                             Content="Icons"
-                             GroupName="Navigation"
-                             Checked="OnIconButtonChecked" />
-                <RadioButton x:Name="SettingsRadioButton"
-                             Style="{StaticResource NavRadioButtonStyle}"
-                             Tag="&#xE115;"
-                             Content="Settings"
-                             GroupName="Navigation"
-                             Checked="OnSettingsButtonChecked" />
-            </StackPanel>
+                <StackPanel 
+                    Grid.Row="1">
+                    <RadioButton x:Name="HomeRadioButton"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Tag="&#xE10F;"
+                                 Content="Home"
+                                 GroupName="Navigation"
+                                 Checked="OnHomeButtonChecked" />
+                    <RadioButton x:Name="IconsRadioButton"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Tag="&#xE9D9;"
+                                 Content="Icons"
+                                 GroupName="Navigation"
+                                 Checked="OnIconButtonChecked" />
+                </StackPanel>
+                <StackPanel Grid.Row="2">
+                    <RadioButton 
+                                 x:Name="AboutRadioButton"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Tag="&#xE946;"
+                                 Content="About"
+                                 GroupName="Navigation"
+                                 Checked="OnAboutButtonChecked" />
+                    <RadioButton x:Name="SettingsRadioButton"
+                                 Style="{StaticResource NavRadioButtonStyle}"
+                                 Tag="&#xE115;"
+                                 Content="Settings"
+                                 GroupName="Navigation"
+                                 Checked="OnSettingsButtonChecked" />
+                </StackPanel>
+            </Grid>
         </SplitView.Pane>
     </SplitView>
 </Page>

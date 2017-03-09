@@ -40,5 +40,12 @@ namespace XamarinImageFactory
             if (ShellSplitView.Content != null)
                 ((Frame)ShellSplitView.Content).Navigate(typeof(SettingsPage));
         }
+
+        private void OnAboutButtonChecked(object sender, RoutedEventArgs e)
+        {
+            ShellSplitView.IsPaneOpen = false;
+            if (ShellSplitView.Content != null)
+                ((Frame)ShellSplitView.Content).Navigate(typeof(AboutPage));
+        }
     }
 }

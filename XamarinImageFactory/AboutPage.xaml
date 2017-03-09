@@ -1,0 +1,28 @@
+﻿<Page x:Class="XamarinImageFactory.AboutPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:XamarinImageFactory"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <ScrollViewer>
+            <StackPanel Margin="20">
+                <TextBlock Text="About"
+                           Style="{StaticResource HeaderTextBlockStyle}" />
+                <TextBlock TextWrapping="WrapWholeWords"
+                           Margin="0, 20, 0, 0"
+                           Text="This is for creating Xamarin assets for all platform, using one big asset. " />
+                <StackPanel Margin="0, 20, 0, 0">
+                    <TextBlock Style="{StaticResource SubheaderTextBlockStyle}"
+                               Text="References:" />
+                    <TextBlock Style="{StaticResource BodyTextBlockStyle}"
+                               Text="Xamarin images" />
+                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
+                               TextWrapping="Wrap"
+                               Text="https://developer.xamarin.com/guides/xamarin-forms/user-interface/images/#Local_Images" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

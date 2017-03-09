@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace XamarinImageFactory.Common
 {
-    public enum IOSAssetTypes
+    public enum WindowsAssetTypes
     {
         Image100,
+        Image125,
+        Image150,
         Image200,
-        Image300
+        Image400
     }
 }
