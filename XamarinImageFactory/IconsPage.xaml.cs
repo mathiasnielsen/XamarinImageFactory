@@ -563,10 +563,16 @@ namespace XamarinImageFactory
             {
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(sourceStream);
 
-                BitmapTransform transform = new BitmapTransform() { ScaledHeight = (uint)scaledSize.Height, ScaledWidth = (uint)scaledSize.Width };
-                PixelDataProvider pixelData = await decoder.GetPixelDataAsync(
+                var transform = new BitmapTransform()
+                {
+                    ScaledHeight = (uint)scaledSize.Height,
+                    ScaledWidth = (uint)scaledSize.Width,
+                    InterpolationMode = BitmapInterpolationMode.Cubic
+                };
+
+                var pixelData = await decoder.GetPixelDataAsync(
                     BitmapPixelFormat.Rgba8,
-                    BitmapAlphaMode.Straight,
+                    BitmapAlphaMode.Premultiplied,
                     transform,
                     ExifOrientationMode.RespectExifOrientation,
                     ColorManagementMode.DoNotColorManage);
@@ -574,10 +580,20 @@ namespace XamarinImageFactory
                 using (var destinationStream = await destinationFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
                     var bitmapEncoderId = GetBitmapEncoderIdBasedOnExtension(sourceFile.Name);
-                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(bitmapEncoderId, destinationStream);
+                    var encoder = await BitmapEncoder.CreateAsync(bitmapEncoderId, destinationStream);
 
                     var detachedPixelData = pixelData.DetachPixelData();
-                    encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Premultiplied, (uint)scaledSize.Width, (uint)scaledSize.Height, 96, 96, detachedPixelData);
+                    var dpi = 96;
+
+                    encoder.SetPixelData(
+                        BitmapPixelFormat.Rgba8, 
+                        BitmapAlphaMode.Premultiplied, 
+                        (uint)scaledSize.Width, 
+                        (uint)scaledSize.Height, 
+                        dpi, 
+                        dpi, 
+                        detachedPixelData);
+
                     await encoder.FlushAsync();
                 }
 

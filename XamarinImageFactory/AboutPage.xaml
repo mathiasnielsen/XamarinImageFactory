@@ -41,6 +41,10 @@
                                Text="Windows images scaling" />
                     <TextBlock Style="{StaticResource LinkTextBlockStyle}"
                                Text="https://msdn.microsoft.com/en-us/library/windows/apps/xaml/hh965325.aspx" />
+                    <TextBlock Style="{StaticResource LinkHeaderTextBlockStyle}"
+                               Text="Scaling image" />
+                    <TextBlock Style="{StaticResource LinkTextBlockStyle}"
+                               Text="http://stackoverflow.com/questions/87753/resizing-an-image-without-losing-any-quality" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
