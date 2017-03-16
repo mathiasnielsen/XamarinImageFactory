@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using XamarinImageFactory.Common;
 using XamarinImageFactory.Factories;
 using XamarinImageFactory.Models;
+using XamarinImageFactory.Tools;
 using XamarinImageFactory.Utitlities;
 
 namespace XamarinImageFactory
@@ -23,6 +24,8 @@ namespace XamarinImageFactory
     /// </summary>
     public sealed partial class IconsPage : Page
     {
+        private readonly ImageFileManipulator _imageFileManipulator;
+
         private StorageFolder _lastUsedFolder;
         private StorageFolder _folder;
         private string _name;
@@ -48,6 +51,8 @@ namespace XamarinImageFactory
         public IconsPage()
         {
             this.InitializeComponent();
+
+            _imageFileManipulator = new ImageFileManipulator();
 
             PrepareUIElements();
             Initialize();
@@ -359,7 +364,7 @@ namespace XamarinImageFactory
             var windowsFile = await windowsFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
             var scaledSize = await GetWindowsImageSizeAsync(imageType);
-            await ResizeImageAsync(_file, windowsFile, scaledSize);
+            await _imageFileManipulator.ResizeImageAsync(_file, windowsFile, scaledSize);
             await SaveStorageFileAsync(windowsFile);
 
             return windowsFile;
@@ -371,7 +376,7 @@ namespace XamarinImageFactory
             var iosImageFile = await iosFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
             var scaledSize = await GetIOSImageSizeAsync(imageType);
-            await ResizeImageAsync(_file, iosImageFile, scaledSize);
+            await _imageFileManipulator.ResizeImageAsync(_file, iosImageFile, scaledSize);
             await SaveStorageFileAsync(iosImageFile);
 
             return iosImageFile;
@@ -385,7 +390,7 @@ namespace XamarinImageFactory
             var androidImageFile = await androidDrawableFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
             var scaledSize = await GetAndroidImageSizeAsycn(imageType);
-            await ResizeImageAsync(_file, androidImageFile, scaledSize);
+            await _imageFileManipulator.ResizeImageAsync(_file, androidImageFile, scaledSize);
             await SaveStorageFileAsync(androidImageFile);
 
             return androidImageFile;
@@ -555,69 +560,6 @@ namespace XamarinImageFactory
             size.Width = imageSize.Width * factor;
 
             return size;
-        }
-
-        private async Task<StorageFile> ResizeImageAsync(StorageFile sourceFile, StorageFile destinationFile, Size scaledSize)
-        {
-            using (var sourceStream = await sourceFile.OpenAsync(FileAccessMode.Read))
-            {
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(sourceStream);
-
-                var transform = new BitmapTransform()
-                {
-                    ScaledHeight = (uint)scaledSize.Height,
-                    ScaledWidth = (uint)scaledSize.Width,
-                    InterpolationMode = BitmapInterpolationMode.Cubic
-                };
-
-                var pixelData = await decoder.GetPixelDataAsync(
-                    BitmapPixelFormat.Rgba8,
-                    BitmapAlphaMode.Premultiplied,
-                    transform,
-                    ExifOrientationMode.RespectExifOrientation,
-                    ColorManagementMode.DoNotColorManage);
-
-                using (var destinationStream = await destinationFile.OpenAsync(FileAccessMode.ReadWrite))
-                {
-                    var bitmapEncoderId = GetBitmapEncoderIdBasedOnExtension(sourceFile.Name);
-                    var encoder = await BitmapEncoder.CreateAsync(bitmapEncoderId, destinationStream);
-
-                    var detachedPixelData = pixelData.DetachPixelData();
-                    var dpi = 96;
-
-                    encoder.SetPixelData(
-                        BitmapPixelFormat.Rgba8, 
-                        BitmapAlphaMode.Premultiplied, 
-                        (uint)scaledSize.Width, 
-                        (uint)scaledSize.Height, 
-                        dpi, 
-                        dpi, 
-                        detachedPixelData);
-
-                    await encoder.FlushAsync();
-                }
-
-                return destinationFile;
-            }
-        }
-
-        private Guid GetBitmapEncoderIdBasedOnExtension(string filename)
-        {
-            var bitmapEncoder = BitmapEncoder.PngEncoderId;
-
-            var extension = Path.GetExtension(filename);
-            switch (extension)
-            {
-                case ".png":
-                    bitmapEncoder = BitmapEncoder.PngEncoderId;
-                    break;
-
-                case ".jpg":
-                    bitmapEncoder = BitmapEncoder.JpegEncoderId;
-                    break;
-            }
-
-            return bitmapEncoder;
         }
 
         private async Task SaveFileAsync(StorageFolder folder, string filename)
