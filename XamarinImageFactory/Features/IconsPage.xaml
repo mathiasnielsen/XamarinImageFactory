@@ -39,7 +39,7 @@
                     Margin="0, 20, 0, 0" />
             <ComboBox x:Name="ResultComboBox"
                       HorizontalAlignment="Stretch"
-                      Grid.Row="3"
+                      Grid.Row="2"
                       Grid.Column="2"
                       Margin="0, 20, 0, 0"
                       PlaceholderText="Platform">

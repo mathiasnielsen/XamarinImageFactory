@@ -19,7 +19,7 @@ namespace XamarinImageFactory.Tools
                 {
                     ScaledHeight = (uint)scaledSize.Height,
                     ScaledWidth = (uint)scaledSize.Width,
-                    InterpolationMode = BitmapInterpolationMode.Cubic
+                    InterpolationMode = BitmapInterpolationMode.Fant
                 };
 
                 var pixelData = await decoder.GetPixelDataAsync(
