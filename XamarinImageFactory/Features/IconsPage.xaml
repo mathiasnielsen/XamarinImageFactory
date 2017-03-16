@@ -12,6 +12,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -23,18 +24,22 @@
                 <ColumnDefinition Width="20" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            <TextBlock Text="Icon generator"
+                       Grid.ColumnSpan="3"
+                       Style="{StaticResource HeaderTextBlockStyle}"/>
             <TextBox x:Name="FolderNameTextBox"
-                     Grid.Row="0"
+                     Grid.Row="1"
                      Grid.ColumnSpan="3"
+                     Margin="0, 20, 0, 0"
                      PlaceholderText="Write foldername here..." />
             <Button x:Name="PickButton"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     HorizontalAlignment="Stretch"
                     Content="Pick a file"
                     Margin="0, 20, 0, 0" />
             <ComboBox x:Name="ResultComboBox"
                       HorizontalAlignment="Stretch"
-                      Grid.Row="1"
+                      Grid.Row="3"
                       Grid.Column="2"
                       Margin="0, 20, 0, 0"
                       PlaceholderText="Platform">
@@ -43,7 +48,7 @@
                 <ComboBoxItem Content="WINDOWS" />
             </ComboBox>
             <Grid x:Name="YourImageBackground"
-                  Grid.Row="2"
+                  Grid.Row="3"
                   Margin="0, 20"
                   CornerRadius="10"
                   Background="LightGray">
@@ -52,7 +57,7 @@
                            Text="Your image" />
                 <Image x:Name="MainImage" />
             </Grid>
-            <Grid Grid.Row="2"
+            <Grid Grid.Row="3"
                   Grid.Column="2"
                   Margin="0, 20"
                   CornerRadius="10"
@@ -63,13 +68,13 @@
                 <Image x:Name="ResultImage" />
             </Grid>
             <TextBlock x:Name="FileInfoTextBlock"
-                       Grid.Row="3"
+                       Grid.Row="4"
                        Text="Image info" />
             <TextBlock x:Name="ResultFileInfoTextBlock"
                        Text="Result image info"
-                       Grid.Row="3"
+                       Grid.Row="4"
                        Grid.Column="2" />
-            <StackPanel Grid.Row="4"
+            <StackPanel Grid.Row="5"
                         Grid.Column="0"
                         Margin="0, 20, 0, 0"
                         Orientation="Vertical">
@@ -85,7 +90,7 @@
             </StackPanel>
             <StackPanel x:Name="RadioButtonContainer"
                         Margin="0, 20, 0, 0"
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Grid.Column="2"
                         Orientation="Vertical">
                 <RadioButton x:Name="LowQualityCheckbox"
@@ -99,18 +104,18 @@
                              Content="High quality" />
             </StackPanel>
             <Button x:Name="CreateImagesButton"
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Margin="0, 20, 0, 0"
                     Content="Create images" />
             <Button x:Name="ShowFolderButton"
                     Content="Show folder"
                     Margin="0, 20, 0, 0"
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Grid.Column="2" />
             <TextBlock x:Name="ResultTextBlock"
                        Margin="0, 20, 0, 0"
                        Text="Currently no files have been created"
-                       Grid.Row="6"
+                       Grid.Row="7"
                        Grid.ColumnSpan="3"/>
         </Grid>
         <TextBlock x:Name="LittleGirl"
